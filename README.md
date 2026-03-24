@@ -13,8 +13,6 @@ Frontend is:
 - [FiraCode font](https://github.com/tonsky/FiraCode)
 
 ### Todo
-- Scrubber and seeking
-- Chapters
 - Better mobile experience
 - Pipeline Redis queries
 
