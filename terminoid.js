@@ -1,4 +1,4 @@
-// Copyright 2024 0xDEADFED5
+// Copyright 2024 electroglyph
 const el_file = document.getElementById('fileElem');
 const el_upload = document.getElementById('upload');
 const el_terminal = document.getElementById('terminal');
@@ -145,11 +145,14 @@ async function onUpload(e) {
     if (!await parse_cast(text.trim())) {
         return;
     }
+    // Support v3 dual-terminal header (left.cols/rows) as well as v1/v2 (width/height)
+    const termCols = parseInt(cast_header.width) || (cast_header.left && cast_header.left.cols) || 80;
+    const termRows = parseInt(cast_header.height) || (cast_header.left && cast_header.left.rows) || 24;
     term = new Terminal({
         convertEol: true,
         allowProposedApi: true,
-        cols: parseInt(cast_header.width),
-        rows: parseInt(cast_header.height),
+        cols: termCols,
+        rows: termRows,
         fontFamily: 'Fira Code',
         fontSize: 10,
         cursorBlink: true,
@@ -158,16 +161,22 @@ async function onUpload(e) {
     });
     const fitAddon = new FitAddon.FitAddon();
     const canvasAddon = new CanvasAddon.CanvasAddon();
-    const width = getTextWidth(cast_header.width, '10px Fira Code');
+    const width = getTextWidth(termCols, '10px Fira Code');
     term.open(el_terminal);
     term.loadAddon(fitAddon);
     term.loadAddon(canvasAddon); // fix for corrupted screenshots
     el_terminal.style.width = width.toString() + "px";
     fitAddon.fit();
+    // For v3: only replay 'o' (left terminal) events for the thumbnail
+    const isV3 = cast_header.version === 3;
     let buffer = '';
-    for (let x = 0; x < cast_len / 2; x++) {
-        if (cast_code[x] !== 'm') {
-            buffer += cast_data[x];
+    const half = Math.floor(cast_len / 2);
+    for (let x = 0; x < half; x++) {
+        // For v3 skip right-terminal ('r'), resize, show_right, hide_right events
+        if (isV3) {
+            if (cast_code[x] === 'o') buffer += cast_data[x];
+        } else {
+            if (cast_code[x] !== 'm') buffer += cast_data[x];
         }
     }
     term.write(buffer);

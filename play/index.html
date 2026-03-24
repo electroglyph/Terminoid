@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Terminoid</title>
   <link rel="stylesheet" href="../terminal.min.css" />
   <link rel="stylesheet" href="../xterm.css" />
@@ -12,131 +13,251 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <style>
-        :root {
-            --global-font-size: 18px;
-            --global-line-height: 1.4em;
-            --global-space: 10px;
-            --font-stack: 'Fira Code', Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-            --mono-font-stack: 'Fira Code', Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-            --background-color: #222225;
-            --page-width: 60em;
-            --font-color: #e8e9ed;
-            --invert-font-color: #222225;
-            --secondary-color: #a3abba;
-            --tertiary-color: #a3abba;
-            --primary-color: #62c4ff;
-            --error-color: #ff3c74;
-            --progress-bar-background: #3f3f44;
-            --progress-bar-fill: #62c4ff;
-            --code-bg-color: #3f3f44;
-            --input-style: solid;
-            --display-h1-decoration: none;
-        }
-		button {
-		  background-color: #222225;
-          border: 2px solid #62c4ff;
-          color: #62c4ff;
-		  padding: 10px 20px;
-		  text-align: center;
-		  text-decoration: none;
-		  display: inline-block;
-          font-family: 'Fira Code', monospace;
-          font-weight: 500;
-		  font-size: 18px;
-		}
-        input {
-            border: 2px solid #62c4ff !important;
-        }
-        textarea {
-            border: 2px solid #62c4ff;
-        }
-        textarea:focus {
-            border: 2px solid #62c4ff;
-        }
-        label {
-            color: #62c4ff;
-        }
-        button:hover:not(.disabled):not(.delete) {
-          background: #62c4ff;
-          color: #222225;
-        }
-        .disabled {
-          color: #222225;
-          background: #a3abba;
-          border: 2px solid white;
-        }
-        .delete {
-          background-color: #222225;
-          border: 2px solid #c70000;
-          color: #c70000;
-        }
-        .delete:hover {
-          background-color: #c70000;
-          color: #222225;
-        }
-        .terminal-prompt {
-            font-size: 21px;
-        }
-        #views{
-          bottom: 0;
-          text-align: center;
-        }
-        #warning{
-          color: #c70000;
-        }
-        #share_div{
-          display: flex;
-          flex-direction: row;
-        }
-        #result{
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          text-align: center;
-          padding: 10px;
-        }
-    </style>
+    :root {
+      --global-font-size: 18px;
+      --global-line-height: 1.4em;
+      --global-space: 10px;
+      --font-stack: 'Fira Code', Menlo, Monaco, Lucida Console, Liberation Mono,
+        DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+      --mono-font-stack: 'Fira Code', Menlo, Monaco, Lucida Console, Liberation Mono,
+        DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+      --background-color: #222225;
+      --page-width: 60em;
+      --font-color: #e8e9ed;
+      --invert-font-color: #222225;
+      --secondary-color: #a3abba;
+      --tertiary-color: #a3abba;
+      --primary-color: #62c4ff;
+      --error-color: #ff3c74;
+      --progress-bar-background: #3f3f44;
+      --progress-bar-fill: #62c4ff;
+      --code-bg-color: #3f3f44;
+      --input-style: solid;
+      --display-h1-decoration: none;
+    }
+
+    button {
+      background-color: #222225;
+      border: 2px solid #62c4ff;
+      color: #62c4ff;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-family: 'Fira Code', monospace;
+      font-weight: 500;
+      font-size: 18px;
+    }
+
+    input {
+      border: 2px solid #62c4ff !important;
+    }
+
+    textarea {
+      border: 2px solid #62c4ff;
+    }
+
+    textarea:focus {
+      border: 2px solid #62c4ff;
+    }
+
+    label {
+      color: #62c4ff;
+    }
+
+    button:hover:not(.disabled):not(.delete) {
+      background: #62c4ff;
+      color: #222225;
+    }
+
+    .disabled {
+      color: #222225;
+      background: #a3abba;
+      border: 2px solid white;
+    }
+
+    .delete {
+      background-color: #222225;
+      border: 2px solid #c70000;
+      color: #c70000;
+    }
+
+    .delete:hover {
+      background-color: #c70000;
+      color: #222225;
+    }
+
+    .terminal-prompt {
+      font-size: 21px;
+    }
+
+    #views {
+      bottom: 0;
+      text-align: center;
+    }
+
+    #warning {
+      color: #c70000;
+    }
+
+    #share_div {
+      display: flex;
+      flex-direction: row;
+    }
+
+    #result {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 10px;
+    }
+
+    #terminal-container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #terminal-left {
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    #terminal-right {
+      flex: 1;
+      overflow: hidden;
+      display: none;
+    }
+
+    #divider-bar {
+      width: 5px;
+      background: #444;
+      cursor: col-resize;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    #scrubber-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #scrubber {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: #3f3f44;
+      outline: none;
+      border: none !important;
+      cursor: pointer;
+    }
+
+    #scrubber::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #62c4ff;
+      cursor: pointer;
+    }
+
+    #scrubber::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #62c4ff;
+      cursor: pointer;
+      border: none;
+    }
+
+    #time-display,
+    #duration-display {
+      font-family: 'Fira Code', monospace;
+      font-size: 14px;
+      color: #a3abba;
+      white-space: nowrap;
+      min-width: 40px;
+    }
+
+    #controls-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+  </style>
 </head>
+
 <body>
-<div class="container">
-  <div class="terminal-nav">
-    <header class="terminal-logo">
-      <div class="logo terminal-prompt"><a href="/" class="no-style">Terminoid</a></div>
-    </header>
-    <nav class="terminal-menu">
-      <ul vocab="https://schema.org/" typeof="BreadcrumbList">
-        <li property="itemListElement" typeof="ListItem"><a href="/discover/" property="item" typeof="WebPage" class="menu-item"><span property="name">Discover</span></a><meta property="position" content="1"></li>
-        <li property="itemListElement" typeof="ListItem"><a href="/popular/" property="item" typeof="WebPage" class="menu-item"><span property="name">Popular</span></a><meta property="position" content="2"></li>
-        <li property="itemListElement" typeof="ListItem"><a href="/about/" property="item" typeof="WebPage" class="menu-item"><span property="name">About</span></a><meta property="position" content="3"></li>
-        <li style="height: 28px;"><a class="github-button" href="https://github.com/0xDEADFED5/Terminoid" data-size="large" data-show-count="true" aria-label="Star 0xDEADFED5/Terminoid on GitHub" target="_blank">Terminoid</a></li>
-      </ul>
-    </nav>
+  <div class="container">
+    <div class="terminal-nav">
+      <header class="terminal-logo">
+        <div class="logo terminal-prompt"><a href="/" class="no-style">Terminoid</a></div>
+      </header>
+      <nav class="terminal-menu">
+        <ul vocab="https://schema.org/" typeof="BreadcrumbList">
+          <li property="itemListElement" typeof="ListItem"><a href="/discover/" property="item" typeof="WebPage"
+              class="menu-item"><span property="name">Discover</span></a>
+            <meta property="position" content="1">
+          </li>
+          <li property="itemListElement" typeof="ListItem"><a href="/popular/" property="item" typeof="WebPage"
+              class="menu-item"><span property="name">Popular</span></a>
+            <meta property="position" content="2">
+          </li>
+          <li property="itemListElement" typeof="ListItem"><a href="/about/" property="item" typeof="WebPage"
+              class="menu-item"><span property="name">About</span></a>
+            <meta property="position" content="3">
+          </li>
+          <li style="height: 28px;"><a class="github-button" href="https://github.com/electroglyph/Terminoid"
+              data-size="large" data-show-count="true" aria-label="Star electroglyph/Terminoid on GitHub"
+              target="_blank">Terminoid</a></li>
+        </ul>
+      </nav>
+    </div>
   </div>
-</div>
-<div id="result" class="container">
-  <p id="warning"></p>
-  <p id="title">Loading...</p>
-  <div id="terminal"></div>
-  <div id="pic"></div>
-  <br>
-  <div id="play"></div>
-  <p id="desc"></p>
-  <p id="size"></p>
-  <div id="download"></div>
-  <div id="share_text"></div>
-  <div id="share_div"></div>
-  <div id="delete_div"><br></div>
-  <p id="views"></p>
-</div>
-<script src="../addon-webgl.js"></script>
-<script src="../addon-web-links.js"></script>
-<script src="../addon-fit.js"></script>
-<script src="../xterm.js"></script>
-<script src="../pako.min.js"></script>
-<script src="play.js"></script>
-<script src="https://buttons.github.io/buttons.js"></script>
+  <div id="result" class="container">
+    <p id="warning"></p>
+    <p id="title">Loading...</p>
+    <div id="terminal-container">
+      <div id="terminal-left"></div>
+      <div id="divider-bar"></div>
+      <div id="terminal-right"></div>
+    </div>
+    <div id="pic"></div>
+    <br>
+    <div id="scrubber-row">
+      <span id="time-display">0:00</span>
+      <input type="range" id="scrubber" min="0" max="1000" value="0" step="1">
+      <span id="duration-display">0:00</span>
+    </div>
+    <div id="controls-row">
+      <div id="play"></div>
+      <div id="download"></div>
+    </div>
+    <p id="desc"></p>
+    <p id="size"></p>
+    <div id="share_text"></div>
+    <div id="share_div"></div>
+    <div id="delete_div"><br></div>
+    <p id="views"></p>
+  </div>
+  <script src="../addon-webgl.js"></script>
+  <script src="../addon-web-links.js"></script>
+  <script src="../addon-fit.js"></script>
+  <script src="../xterm.js"></script>
+  <script src="../pako.min.js"></script>
+  <script src="play.js"></script>
+  <script src="https://buttons.github.io/buttons.js"></script>
 </body>
+
 </html>

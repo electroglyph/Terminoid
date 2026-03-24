@@ -1,4 +1,4 @@
-// Copyright 2024 0xDEADFED5
+// Copyright 2024 electroglyph
 async function onLoad(e) {
     const r = await fetch('/hot');
     const o = await r.json();
