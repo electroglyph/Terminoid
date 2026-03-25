@@ -120,24 +120,35 @@ async function init_terms() {
     let leftWidth, rightWidth;
 
     if (cast_version === 3) {
-        // For dual-terminal: pick the largest font that makes BOTH terminals
-        // fit side-by-side within the window. We ignore custom divider_pct here 
-        // to avoid artificially constricting one side when the other has plenty of space.
         const dividerPx  = 5;
-        const availWidth = window.innerWidth - 40; // reserve 40px for body padding/scrollbars
+        const availWidth = window.innerWidth - 40;
 
-        leftWidth  = await getTextWidth(leftCols,  '16px Fira Code');
-        rightWidth = await getTextWidth(rightCols, '16px Fira Code');
+        if (cast_header.right_visible) {
+            // Both panes start visible — pick the largest font that fits both side-by-side.
+            leftWidth  = await getTextWidth(leftCols,  '16px Fira Code');
+            rightWidth = await getTextWidth(rightCols, '16px Fira Code');
 
-        if ((leftWidth + rightWidth + dividerPx) > availWidth) {
-            fontSize = 5; // fallback if nothing fits
-            for (let fs = 15; fs >= 5; fs--) {
-                leftWidth  = await getTextWidth(leftCols,  fs + 'px Fira Code');
-                rightWidth = await getTextWidth(rightCols, fs + 'px Fira Code');
-                if ((leftWidth + rightWidth + dividerPx) <= availWidth) {
-                    fontSize = fs;
-                    break;
+            if ((leftWidth + rightWidth + dividerPx) > availWidth) {
+                fontSize = 5; // fallback if nothing fits
+                for (let fs = 15; fs >= 5; fs--) {
+                    leftWidth  = await getTextWidth(leftCols,  fs + 'px Fira Code');
+                    rightWidth = await getTextWidth(rightCols, fs + 'px Fira Code');
+                    if ((leftWidth + rightWidth + dividerPx) <= availWidth) {
+                        fontSize = fs;
+                        break;
+                    }
                 }
+            }
+        } else {
+            // Right pane starts hidden. rightCols from the header is unreliable
+            // (xterm can't measure a hidden element, so it may be the default 80).
+            // Size font for the left terminal only; a resize event during playback
+            // will recalculate when the right pane eventually appears.
+            leftWidth = await getTextWidth(leftCols, '16px Fira Code');
+            if (leftWidth > availWidth) {
+                const res = await getMaxTextSize(leftCols);
+                fontSize  = res[0];
+                leftWidth = res[1];
             }
         }
     } else {
@@ -264,16 +275,47 @@ function dispatch_event(ev) {
             if (termRight) termRight.write(typeof ev.data === 'string' ? ev.data : '');
             break;
         case 'resize':
-            if (termLeft && ev.data.left)  termLeft.resize(ev.data.left.cols,   ev.data.left.rows);
+            if (termLeft  && ev.data.left)  termLeft.resize(ev.data.left.cols,   ev.data.left.rows);
             if (termRight && ev.data.right) termRight.resize(ev.data.right.cols, ev.data.right.rows);
+            // If both panes are now visible, recalculate font size to match the real column counts.
+            // This handles the case where right_visible was false at header time, so the initial
+            // font was sized for leftCols only — once the pane appears and resize fires, snap it.
+            if (termLeft && termRight && el_terminal_right.style.display !== 'none') {
+                (async () => {
+                    const lc = termLeft.cols, rc = termRight.cols;
+                    const divPx = 5, avail = window.innerWidth - 40;
+                    let lw = await getTextWidth(lc, '16px Fira Code');
+                    let rw = await getTextWidth(rc, '16px Fira Code');
+                    let newFs = 16;
+                    if ((lw + rw + divPx) > avail) {
+                        newFs = 5;
+                        for (let fs = 15; fs >= 5; fs--) {
+                            lw = await getTextWidth(lc, fs + 'px Fira Code');
+                            rw = await getTextWidth(rc, fs + 'px Fira Code');
+                            if ((lw + rw + divPx) <= avail) { newFs = fs; break; }
+                        }
+                    }
+                    if (termLeft)  termLeft.options.fontSize  = newFs;
+                    if (termRight) termRight.options.fontSize = newFs;
+                })();
+            }
             break;
-        case 'show_right':
+        case 'show_right': {
+            const t0 = Date.now();
             el_divider.style.display        = 'block';
             el_terminal_right.style.display = 'block';
+            // Force a synchronous reflow so we can measure how long the layout change takes,
+            // then add that duration back to play_start so playback doesn't skip forward.
+            void el_terminal_right.offsetHeight;
+            play_start += (Date.now() - t0);
+            // Refresh left terminal to clear the WebGL canvas blackout caused by the layout shift.
+            if (termLeft) termLeft.refresh(0, termLeft.rows - 1);
             break;
+        }
         case 'hide_right':
             el_divider.style.display        = 'none';
             el_terminal_right.style.display = 'none';
+            if (termLeft) termLeft.refresh(0, termLeft.rows - 1);
             break;
         case 'm':
             // marker — skip
