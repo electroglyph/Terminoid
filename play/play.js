@@ -362,8 +362,6 @@ async function seek(target_t) {
 
     // Reset divider/pane visibility to initial state
     if (cast_version === 3) {
-        const divPct = cast_header.divider_pct || 50;
-        el_terminal_left.style.width = divPct + '%';
         if (cast_header.right_visible) {
             el_divider.style.display        = 'block';
             el_terminal_right.style.display = 'block';
