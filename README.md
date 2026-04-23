@@ -7,7 +7,7 @@ However, it's mostly intended for recordings made with the [AtheriZ](https://git
 
 ### Features
 - Small and barebones
-- Backend is entirely Openresty and Redis
+- Backend is entirely Openresty and Redis (backend is entirely in nginx.conf in lua)
 Frontend is:
 - [xterm.js](https://xtermjs.org)
 - [pako](https://github.com/nodeca/pako)
